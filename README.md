@@ -98,7 +98,7 @@ URL:  http://54.202.10.79
 
 ###### Deploy the Item Catalog project.
 13. Clone and setup your Item Catalog project from the Github repository.
-	-Create flask app taken from [digitalocean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps)
+	- Create flask app taken from [digitalocean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps)
 		* `cd /var/www`
 		* `sudo mkdir catalog`
 		* `cd catalog`
