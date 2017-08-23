@@ -117,7 +117,7 @@ URL:  http://ec2-54-202-147-155.us-west-2.compute.amazonaws.com
 			    return "Hello, world (Testing!)"
 			if __name__ == "__main__":
 				app.run()```
-	- Install flask and oath
+	- Install flask and oauth
 		* `sudo apt-get install python-pip`
 		* `pip install --upgrade oauth2client`
 		* `sudo pip install virtualenv`
@@ -133,7 +133,8 @@ URL:  http://ec2-54-202-147-155.us-west-2.compute.amazonaws.com
 
 	- Configure And Enable New Virtual Host
 		* Create host config file `sudo nano /etc/apache2/sites-available/catalog.conf` paste the following:
-			```<VirtualHost *:80>
+			```
+            <VirtualHost *:80>
 			  ServerName 54.202.147.155
 			  ServerAdmin admin@54.202.147.155
 			  ServerAlias ec2-54-202-147-155.us-west-2.compute.amazonaws.com
@@ -151,47 +152,46 @@ URL:  http://ec2-54-202-147-155.us-west-2.compute.amazonaws.com
 			  ErrorLog ${APACHE_LOG_DIR}/error.log
 			  LogLevel warn
 			  CustomLog ${APACHE_LOG_DIR}/access.log combined
-			</VirtualHost>```
-			    * save file(nano: `ctrl+x`, `Y`, Enter)
-			    * Enable `sudo a2ensite catalog`
-			    sudo a2dissite 000-default.conf
+			</VirtualHost>
+			```
+		* Enable `sudo a2ensite catalog`
+		* Dissable default `sudo a2dissite 000-default.conf`
+		* Create the wsgi file
+	    * `cd /var/www/catalog`
+	    * `sudo nano catalog.wsgi`
 
-			* Create the wsgi file
-			    * `cd /var/www/catalog`
-			    * `sudo nano catalog.wsgi`
+		  ```
+		  #!/usr/bin/python
+		  import sys
+		  import logging
+		  logging.basicConfig(stream=sys.stderr)
+		  sys.path.insert(0,"/var/www/catalog/")
 
-			  ```#!/usr/bin/python
-			  import sys
-			  import logging
-			  logging.basicConfig(stream=sys.stderr)
-			  sys.path.insert(0,"/var/www/catalog/")
+		  from catalog.project import app as application
+		  application.secret_key = 'secret key'
+		  ```
 
-			  from catalog.project import app as application
-			  application.secret_key = 'secret key'```
+		* `sudo mv __init__.py helloworld.py`
+		* `sudo cp project.py __init__.py`
+		* `sudo service apache2 restart`
 
-			* `sudo mv __init__.py helloworld.py`
-			* `sudo cp project.py __init__.py`
-			* `sudo service apache2 restart`
+	- Clone Github Repo and Make Revisions
+		* `sudo git clone https://github.com/mlupin/fullstack-nanodegree-item-catalog`
+		* `mv /var/www/catalog/fullstack-nanodegree-item-catalog/* /var/www/catalog/catalog/`
+		* change create engine line in project.py, models/models.py, and database_setup.py to: 
+		`engine = create_engine('postgresql://catalog:password@localhost/catalog')`
+		* change path to client_secrets.json to a relative path for client id and oauth flow to:
+		`(r'/var/www/catalog/catalog/client_secrets.json')`
+		* update Authorised redirect URIs in Google Dev Console and update client secrets file			
 
-		- Clone Github Repo and Make Revisions
-			* `sudo git clone https://github.com/mlupin/fullstack-nanodegree-item-catalog`
-			* `mv /var/www/catalog/fullstack-nanodegree-item-catalog/* /var/www/catalog/catalog/`
-			* change create engine line in project.py, models/models.py, and database_setup.py to: 
-			`engine = create_engine('postgresql://catalog:password@localhost/catalog')`
-			* change path to client_secrets.json to a relative path for client id and oauth flow to:
-			`(r'/var/www/catalog/catalog/client_secrets.json')`
-			* update Authorised redirect URIs in Google Dev Console and update client secrets file			
+#### Troubleshoot:
+`sudo tail /var/log/apache2/error.log`
 
-###### Troubleshoot:
-sudo tail /var/log/apache2/error.log
-source venv/bin/activate
-
-
-###### Resource: 
-[Oauth Google Dev Console](console.cloud.google.com)
-[Udacity Discussion - Client Secret Json Not Found](https://discussions.udacity.com/t/client-secret-json-not-found-error/34070/2)
-[Udacity Discussion - Operationalerror-sqlite3](https://discussions.udacity.com/t/operationalerror-sqlite3-operationalerror-unable-to-open-database-file/250007/8)
-[Digital Ocean Tutorials](https://www.digitalocean.com/community/tutorials/)
-[Udacity Discussion - 500 Internal Server Error](https://discussions.udacity.com/t/500-internal-server-error-in-ec2/242304/6)
-[Udacity Discussion - No Module Named SQLalchemy](https://discussions.udacity.com/t/no-module-named-sqlalchemy-white-running-project-in-linux/203592/26)
-[Udacity Discussion - Linux Target WSGI Script](https://discussions.udacity.com/t/linux-target-wsgi-script-cannot-be-loaded-as-python-module/277864/7)
+#### Resource: 
+1. [Oauth Google Dev Console](console.cloud.google.com)
+2. [Udacity Discussion - Client Secret Json Not Found](https://discussions.udacity.com/t/client-secret-json-not-found-error/34070/2)
+3. [Udacity Discussion - Operationalerror-sqlite3](https://discussions.udacity.com/t/operationalerror-sqlite3-operationalerror-unable-to-open-database-file/250007/8)
+4. [Digital Ocean Tutorials](https://www.digitalocean.com/community/tutorials/)
+5. [Udacity Discussion - 500 Internal Server Error](https://discussions.udacity.com/t/500-internal-server-error-in-ec2/242304/6)
+6. [Udacity Discussion - No Module Named SQLalchemy](https://discussions.udacity.com/t/no-module-named-sqlalchemy-white-running-project-in-linux/203592/26)
+7. [Udacity Discussion - Linux Target WSGI Script](https://discussions.udacity.com/t/linux-target-wsgi-script-cannot-be-loaded-as-python-module/277864/7)
